@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>零成本需求处理AI系统</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            background: white;
+            color: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+        }
+        
+        main {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: var(--light);
+            padding: 25px;
+            border-right: 1px solid #eee;
+        }
+        
+        .stage-list {
+            list-style: none;
+        }
+        
+        .stage-item {
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .stage-item:hover {
+            background: #e9ecef;
+        }
+        
+        .stage-item.active {
+            background: #e0f7fa;
+            border-left: 4px solid var(--success);
+            font-weight: 500;
+        }
+        
+        .stage-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .result-section {
+            flex: 1;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fafafa;
+            overflow-y: auto;
+            min-height: 300px;
+        }
+        
+        .result-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-content {
+            line-height: 1.6;
+        }
+        
+        .api-config {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .api-config h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+        }
+        
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .history-item:hover {
+            background: #f1f8ff;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(67, 97, 238, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span>AI</span>
+                <span>需求增效系统</span>
+            </div>
+            <h1>需求处理全阶段AI助手</h1>
+        </header>
+        
+        <main>
+            <div class="sidebar">
+                <h2>需求处理阶段</h2>
+                <ul class="stage-list">
+                    <li class="stage-item active" data-stage="1">
+                        <span class="stage-number">1</span> 需求萌发与识别
+                    </li>
+                    <li class="stage-item" data-stage="2">
+                        <span class="stage-number">2</span> 目标设定与评估
+                    </li>
+                    <li class="stage-item" data-stage="3">
+                        <span class="stage-number">3</span> 规划与决策
+                    </li>
+                    <li class="stage-item" data-stage="4">
+                        <span class="stage-number">4</span> 执行与监控
+                    </li>
+                    <li class="stage-item" data-stage="5">
+                        <span class="stage-number">5</span> 达成/终止与初步反馈
+                    </li>
+                    <li class="stage-item" data-stage="6">
+                        <span class="stage-number">6</span> 记忆沉淀与情感加工
+                    </li>
+                    <li class="stage-item" data-stage="7">
+                        <span class="stage-number">7</span> 回顾反思与意义建构
+                    </li>
+                    <li class="stage-item" data-stage="8">
+                        <span class="stage-number">8</span> 内化与应用
+                    </li>
+                    <li class="stage-item" data-stage="9">
+                        <span class="stage-number">9</span> 社会性整合
+                    </li>
+                </ul>
+                
+                <div class="history-section">
+                    <h3>历史记录</h3>
+                    <div id="history-list"></div>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="input-section">
+                    <h2 id="current-stage">需求萌发与识别</h2>
+                    <textarea id="user-input" placeholder="请输入您的需求描述..."></textarea>
+                    <button id="process-btn" class="btn">
+                        <i class="fas fa-cogs"></i> AI智能分析
+                    </button>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-title">
+                        <h3>分析结果</h3>
+                    </div>
+                    <div class="result-content" id="result-content">
+                        <p>请在上方输入需求后点击"AI智能分析"按钮</p>
+                    </div>
+                </div>
+                
+                <div class="api-config">
+                    <h3>API密钥配置（使用免费额度）</h3>
+                    <div class="form-group">
+                        <label for="api-provider">选择平台</label>
+                        <select id="api-provider" class="form-control">
+                            <option value="baidu">百度文心千帆</option>
+                            <option value="ali">阿里通义千问</option>
+                            <option value="iflytek">讯飞星火</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="api-key">API Key</label>
+                        <input type="text" id="api-key" placeholder="输入您的API Key">
+                    </div>
+                    <div class="form-group">
+                        <label for="api-secret">Secret Key</label>
+                        <input type="text" id="api-secret" placeholder="输入您的Secret Key">
+                    </div>
+                    <button id="save-api" class="btn">保存配置</button>
+                    <p style="margin-top: 15px; font-size: 14px; color: #666;">
+                        提示：密钥仅保存在您的浏览器本地，不会上传到任何服务器
+                    </p>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>© 2023 零成本需求处理AI系统 | 数据完全本地存储 | 免费大模型API驱动</p>
+        </footer>
+    </div>
+
+    <script>
+        // 当前选中的阶段
+        let currentStage = 1;
+        
+        // DOM元素
+        const stageItems = document.querySelectorAll('.stage-item');
+        const userInput = document.getElementById('user-input');
+        const processBtn = document.getElementById('process-btn');
+        const resultContent = document.getElementById('result-content');
+        const currentStageTitle = document.getElementById('current-stage');
+        const apiProvider = document.getElementById('api-provider');
+        const apiKey = document.getElementById('api-key');
+        const apiSecret = document.getElementById('api-secret');
+        const saveApiBtn = document.getElementById('save-api');
+        const historyList = document.getElementById('history-list');
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 加载保存的API配置
+            const savedConfig = localStorage.getItem('aiApiConfig');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                apiProvider.value = config.provider;
+                apiKey.value = config.key;
+                apiSecret.value = config.secret;
+            }
+            
+            // 加载历史记录
+            loadHistory();
+            
+            // 阶段选择事件
+            stageItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 更新UI
+                    stageItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 更新当前阶段
+                    currentStage = parseInt(this.dataset.stage);
+                    updateStageTitle(currentStage);
+                });
+            });
+            
+            // 保存API配置
+            saveApiBtn.addEventListener('click', function() {
+                const config = {
+                    provider: apiProvider.value,
+                    key: apiKey.value,
+                    secret: apiSecret.value
+                };
+                
+                localStorage.setItem('aiApiConfig', JSON.stringify(config));
+                alert('API配置已保存到本地！');
+            });
+            
+            // 处理按钮点击
+            processBtn.addEventListener('click', processDemand);
+        });
+        
+        // 更新阶段标题
+        function updateStageTitle(stage) {
+            const stageTitles = [
+                "需求萌发与识别",
+                "目标设定与评估",
+                "规划与决策",
+                "执行与监控",
+                "达成/终止与初步反馈",
+                "记忆沉淀与情感加工",
+                "回顾反思与意义建构",
+                "内化与应用",
+                "社会性整合"
+            ];
+            
+            currentStageTitle.textContent = `${stage}. ${stageTitles[stage-1]}`;
+        }
+        
+        // 构建阶段提示词
+        function getStagePrompt(stage, input) {
+            const prompts = {
+                1: `你是一个资深产品经理，使用5Why分析法分析以下需求：
+需求描述：${input}
+
+请按以下格式输出：
+1. 表层需求分析：
+2. 第一次追问（Why）：
+3. 第二次追问（Why）：
+4. 根本痛点识别：
+5. Kano模型分类（基本/期望/兴奋）：`,
+                2: `作为目标管理专家，请使用SMART原则和OKR方法评估以下需求：
+需求描述：${input}
+
+输出格式：
+1. SMART目标分解：
+   - Specific（具体）：
+   - Measurable（可衡量）：
+   - Achievable（可实现）：
+   - Relevant（相关）：
+   - Time-bound（时限）：
+2. OKR设定：
+   - 目标（Objective）：
+   - 关键结果（Key Results）：
+3. 成本效益分析：`,
+                3: `你是一个决策分析师，请用SWOT分析和决策矩阵评估以下方案：
+需求描述：${input}
+
+生成决策矩阵：
+| 选项 | 成本 | 风险 | 收益 | 可行性 | 综合评分 |
+|------|------|------|------|--------|----------|
+[用表格形式列出3个选项]
+
+最后给出蒙特卡洛模拟的风险概率评估：`,
+                // 其他阶段的提示词类似...
+                9: `作为组织发展顾问，请设计以下需求的社会性整合方案：
+需求描述：${input}
+
+输出格式：
+1. 经验分享会（Peer Assist）设计：
+2. 实践社区（CoP）建立计划：
+3. 非暴力沟通（NVC）应用方案：
+4. 组织知识沉淀路线图：`
+            };
+            
+            return prompts[stage] || `请分析以下需求：${input}`;
+        }
+        
+        // 处理需求
+        async function processDemand() {
+            const inputText = userInput.value.trim();
+            if (!inputText) {
+                alert('请输入需求描述');
+                return;
+            }
+            
+            // 检查API配置
+            const config = {
+                provider: apiProvider.value,
+                key: apiKey.value,
+                secret: apiSecret.value
+            };
+            
+            if (!config.key || !config.secret) {
+                alert('请先配置API密钥');
+                return;
+            }
+            
+            // 显示加载状态
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<div class="loader"></div> 分析中...';
+            resultContent.innerHTML = '<p>AI正在思考，请稍候...</p>';
+            
+            try {
+                // 获取访问令牌
+                let accessToken;
+                if (config.provider === 'baidu') {
+                    accessToken = await getBaiduAccessToken(config.key, config.secret);
+                } else if (config.provider === 'ali') {
+                    // 阿里云实现类似
+                }
+                
+                if (!accessToken) {
+                    throw new Error('获取访问令牌失败');
+                }
+                
+                // 构建提示词
+                const prompt = getStagePrompt(currentStage, inputText);
+                
+                // 调用大模型API
+                const result = await callAIModel(config.provider, accessToken, prompt);
+                
+                // 显示结果
+                resultContent.innerHTML = `<div class="result-text">${formatResult(result)}</div>`;
+                
+                // 保存到历史记录
+                saveToHistory(currentStage, inputText, result);
+                
+            } catch (error) {
+                console.error('处理失败:', error);
+                resultContent.innerHTML = `<p class="error">处理失败: ${error.message || '未知错误'}</p>`;
+            } finally {
+                // 恢复按钮状态
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<i class="fas fa-cogs"></i> AI智能分析';
+            }
+        }
+        
+        // 获取百度Access Token
+        async function getBaiduAccessToken(apiKey, secretKey) {
+            const url = `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secretKey}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            return data.access_token;
+        }
+        
+        // 调用AI模型
+        async function callAIModel(provider, accessToken, prompt) {
+            let url, payload;
+            
+            if (provider === 'baidu') {
+                url = `https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions?access_token=${accessToken}`;
+                payload = {
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ],
+                    temperature: 0.7
+                };
+            }
+            // 其他平台实现类似...
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            return data.result;
+        }
+        
+        // 格式化结果
+        function formatResult(result) {
+            // 将数字列表转换为有序列表
+            result = result.replace(/(\d+\.\s)/g, '<br>$1');
+            
+            // 将表格转换为HTML表格
+            if (result.includes('|')) {
+                const tableRegex = /(\|.+\|(\r?\n)?)+/g;
+                const tables = result.match(tableRegex);
+                
+                if (tables) {
+                    tables.forEach(table => {
+                        const rows = table.trim().split('\n');
+                        let htmlTable = '<div class="table-container"><table class="result-table">';
+                        
+                        rows.forEach((row, index) => {
+                            // 忽略分隔行
+                            if (row.includes('---')) return;
+                            
+                            const cells = row.split('|').filter(cell => cell.trim() !== '');
+                            
+                            if (cells.length > 0) {
+                                htmlTable += '<tr>';
+                                cells.forEach(cell => {
+                                    const tag = index === 0 ? 'th' : 'td';
+                                    htmlTable += `<${tag}>${cell.trim()}</${tag}>`;
+                                });
+                                htmlTable += '</tr>';
+                            }
+                        });
+                        
+                        htmlTable += '</table></div>';
+                        result = result.replace(table, htmlTable);
+                    });
+                }
+            }
+            
+            return result;
+        }
+        
+        // 保存到历史记录
+        function saveToHistory(stage, input, output) {
+            const historyItem = {
+                id: Date.now(),
+                stage,
+                input,
+                output,
+                timestamp: new Date().toLocaleString()
+            };
+            
+            // 获取现有历史记录
+            let history = JSON.parse(localStorage.getItem('demandHistory') || '[]');
+            
+            // 添加到历史记录
+            history.unshift(historyItem);
+            
+            // 保存到本地存储（最多保留50条）
+            if (history.length > 50) {
+                history = history.slice(0, 50);
+            }
+            
+            localStorage.setItem('demandHistory', JSON.stringify(history));
+            
+            // 刷新历史记录列表
+            loadHistory();
+        }
+        
+        // 加载历史记录
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('demandHistory') || '[]');
+            historyList.innerHTML = '';
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>暂无历史记录</p>';
+                return;
+            }
+            
+            history.forEach(item => {
+                const stageTitles = [
+                    "1. 需求萌发",
+                    "2. 目标设定",
+                    "3. 规划决策",
+                    "4. 执行监控",
+                    "5. 达成反馈",
+                    "6. 记忆沉淀",
+                    "7. 回顾反思",
+                    "8. 内化应用",
+                    "9. 社会整合"
+                ];
+                
+                const historyElement = document.createElement('div');
+                historyElement.className = 'history-item';
+                historyElement.innerHTML = `
+                    <div><strong>${stageTitles[item.stage-1]}</strong></div>
+                    <div style="font-size: 14px; color: #666; margin: 5px 0;">${item.input.substring(0, 60)}${item.input.length > 60 ? '...' : ''}</div>
+                    <div style="font-size: 12px; color: #999;">${item.timestamp}</div>
+                `;
+                
+                historyElement.addEventListener('click', () => {
+                    userInput.value = item.input;
+                    resultContent.innerHTML = `<div class="result-text">${formatResult(item.output)}</div>`;
+                    
+                    // 高亮对应的阶段
+                    stageItems.forEach(i => i.classList.remove('active'));
+                    document.querySelector(`.stage-item[data-stage="${item.stage}"]`).classList.add('active');
+                    currentStage = item.stage;
+                    updateStageTitle(currentStage);
+                });
+                
+                historyList.appendChild(historyElement);
+            });
+        }
+    </script>
+</body>
+</html>
